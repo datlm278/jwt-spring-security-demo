@@ -1,6 +1,11 @@
 package com.example.jwtspringsecuritydemo.dto.Authentication;
 
+import lombok.Data;
+import lombok.Generated;
+
+@Data
+@Generated
 public class AuthRequest {
-    public String username;
-    public String password;
+    private String username;
+    private String password;
 }

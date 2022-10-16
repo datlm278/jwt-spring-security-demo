@@ -10,15 +10,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.security.sasl.AuthenticationException;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
@@ -43,15 +47,15 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) throws IOException, UsernameNotFoundException {
         try {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authRequest.username, authRequest.password));
+                    new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
             e.printStackTrace();
         }
 
-        User user = userService.findByUsername(authRequest.username);
-        if (user == null) {
-            throw new UsernameNotFoundException("username isn't existed");
+        User user = userService.findByUsername(authRequest.getUsername());
+        if (user == null || !new BCryptPasswordEncoder().matches(authRequest.getPassword(), user.getPassword())) {
+            throw new BadCredentialsException("Incorrect username or password");
         }
 
         int tokenLifeTime = 3600;

@@ -34,4 +34,7 @@ public class User extends BaseEntity implements Serializable {
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id")})
     private List<Role> roles;
+
+    @OneToOne(mappedBy = "userId")
+    private Employee employee;
 }

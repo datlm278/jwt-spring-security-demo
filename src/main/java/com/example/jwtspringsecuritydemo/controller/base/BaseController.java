@@ -9,7 +9,7 @@ import org.springframework.stereotype.Controller;
 public class BaseController {
     private Claims user;
 
-    public Object getCurentUser() {
+    public Object getCurrentUser() {
         if (user == null) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication != null) {
